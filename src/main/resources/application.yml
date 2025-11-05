@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: bank_rest
+
+  datasource:
+    url: jdbc:postgresql://localhost:5434/postgres
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yml
+    enabled: true
+
+token:
+  jwt:
+    secret: "jbQxmExX43va4BhnHLcPvnJwQAZAVKWp"
+  expiration: 86400000
