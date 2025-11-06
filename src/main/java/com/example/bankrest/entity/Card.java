@@ -30,6 +30,12 @@ public class Card {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(nullable = false, length = 128)
+    private String firstname;
+
+    @Column(nullable = false, length = 128)
+    private String lastname;
+
     @Column(precision = 15, scale = 2)
     private BigDecimal balance;
 
@@ -45,4 +51,15 @@ public class Card {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

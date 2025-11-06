@@ -1,8 +1,8 @@
 package com.example.bankrest.mapper;
 
-import com.example.bankrest.dto.RegisterRequest;
-import com.example.bankrest.dto.UserRequestDto;
-import com.example.bankrest.dto.UserResponseDto;
+import com.example.bankrest.dto.auth.RegisterRequestDto;
+import com.example.bankrest.dto.user.UserRequestDto;
+import com.example.bankrest.dto.user.UserResponseDto;
 import com.example.bankrest.entity.User;
 import org.mapstruct.Mapper;
 
@@ -14,5 +14,5 @@ public interface UserMapper {
     UserResponseDto userEntityToUserResponseDto(User user);
     User userResponseDtoToUserEntity(UserResponseDto userResponseDto);
 
-    User registerRequestDtoToUser(RegisterRequest registerRequest);
+    User registerRequestDtoToUser(RegisterRequestDto registerRequest);
 }

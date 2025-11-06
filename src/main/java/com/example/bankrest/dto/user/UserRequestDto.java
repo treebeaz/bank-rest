@@ -1,10 +1,8 @@
-package com.example.bankrest.dto;
+package com.example.bankrest.dto.user;
 
 import lombok.Value;
-import lombok.experimental.FieldNameConstants;
 
 @Value
-@FieldNameConstants
 public class UserRequestDto {
     Long id;
     String username;

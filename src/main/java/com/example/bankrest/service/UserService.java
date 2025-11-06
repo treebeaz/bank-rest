@@ -1,11 +1,11 @@
 package com.example.bankrest.service;
 
-import com.example.bankrest.dto.RegisterRequest;
-import com.example.bankrest.dto.UserResponseDto;
+
+import com.example.bankrest.dto.auth.RegisterRequestDto;
+import com.example.bankrest.dto.user.UserResponseDto;
 import com.example.bankrest.entity.Role;
 import com.example.bankrest.entity.User;
 import com.example.bankrest.exception.UserNotFoundException;
-import com.example.bankrest.exception.UsernameAlreadyExistsException;
 import com.example.bankrest.mapper.UserMapper;
 import com.example.bankrest.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,19 +30,16 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserResponseDto create(RegisterRequest registerRequest) {
-
-        if(userRepository.existsByUsername(registerRequest.getUsername())) {
-            throw new UsernameAlreadyExistsException("Username with that username already exists");
-        }
+    protected UserResponseDto create(RegisterRequestDto registerRequest,
+                                     boolean isUser) {
 
         return Optional.of(registerRequest)
                 .map(userMapper::registerRequestDtoToUser)
                 .map(user -> {
                     user.setEnabled(true);
-                    user.setRole(Role.USER);
+                    user.setRole((isUser) ? Role.USER : Role.ADMIN);
                     user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-                    log.info("Saving user: {}", user);
+                    log.info("User created successfully: {}", user);
                     return userRepository.save(user);
                 })
                 .map(userMapper::userEntityToUserResponseDto)
@@ -52,7 +49,7 @@ public class UserService implements UserDetailsService {
     public UserResponseDto findById(Long id) {
         return userRepository.findById(id)
                 .map(userMapper::userEntityToUserResponseDto)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User " + id + " not found"));
     }
 
     public User findByUsername(String username) {
@@ -66,13 +63,13 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .map(user -> new org.springframework.security.core.userdetails.User(
-                        user.getUsername(),
-                        user.getPassword(),
-                        Collections.singleton(user.getRole())
-                ))
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user: " + username));
-    }
 
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .authorities("ROLE_" + user.getRole().name())
+                .build();
+    }
 }

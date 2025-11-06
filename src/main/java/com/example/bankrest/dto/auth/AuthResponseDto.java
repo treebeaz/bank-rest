@@ -1,11 +1,11 @@
-package com.example.bankrest.dto;
+package com.example.bankrest.dto.auth;
 
 import lombok.Builder;
 import lombok.Value;
 
 @Value
 @Builder
-public class AuthResponse {
+public class AuthResponseDto {
     String token;
     String username;
     String role;
