@@ -10,7 +10,7 @@ public class RegisterRequestDto {
     String username;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 10, message = "Password must contain at least 10 characters")
+    @Size(min = 7, message = "Password must contain at least 10 characters")
     String password;
 
     @NotBlank(message = "Firstname is required")

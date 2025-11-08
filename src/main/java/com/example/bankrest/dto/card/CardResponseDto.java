@@ -11,11 +11,9 @@ import java.time.LocalDate;
 @Builder
 public class CardResponseDto {
     Long id;
-    String lastDigits;
-    String firstname;
-    String lastname;
+    String masked;
+    String cardHolderName;
     BigDecimal balance;
     LocalDate expiryDate;
     Status status;
-    Long userId;
 }

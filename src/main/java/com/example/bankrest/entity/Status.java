@@ -1,5 +1,5 @@
 package com.example.bankrest.entity;
 
 public enum Status {
-    ACTIVE, BLOCKED, EXPIRED
+    ACTIVE, PENDING_BLOCK, BLOCKED, EXPIRED
 }

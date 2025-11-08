@@ -35,6 +35,4 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-//
-//    @PostMapping("/admin/login")
 }

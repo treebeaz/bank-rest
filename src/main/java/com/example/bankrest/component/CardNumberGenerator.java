@@ -1,12 +1,35 @@
 package com.example.bankrest.component;
 
+import com.example.bankrest.repository.CardRepository;
+import com.google.common.hash.Hashing;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 @Component
+@RequiredArgsConstructor
 public class CardNumberGenerator {
+
     private static final String BIN = "411111";
+    private final CardRepository cardRepository;
+
+    public String[] generateUniqueCardNumber() {
+        String cardNumber;
+        String hashNumber;
+
+        do {
+            cardNumber = generateCardNumber();
+            hashNumber = getHashCardNumber(cardNumber);
+        } while (!isUnique(hashNumber));
+
+        return new String[]{cardNumber, hashNumber};
+    }
+
+    private boolean isUnique(String hash) {
+        return !cardRepository.existsByHashCardNumber(hash);
+    }
 
     public String generateCardNumber() {
         Random random = new Random();
@@ -30,10 +53,6 @@ public class CardNumberGenerator {
         return Integer.toString(check);
     }
 
-//    private boolean isValidCardNumber(String cardNumber) {
-//        return lunaAlgorithm(cardNumber) % 10 == 0;
-//    }
-
     private int lunaAlgorithm(String cardNumber) {
         int sum = 0;
         boolean rotate = false;
@@ -52,4 +71,9 @@ public class CardNumberGenerator {
         return sum;
     }
 
+    public String getHashCardNumber(String cardNumber) {
+        return Hashing.sha256()
+                .hashString(cardNumber, StandardCharsets.UTF_8)
+                .toString();
+    }
 }

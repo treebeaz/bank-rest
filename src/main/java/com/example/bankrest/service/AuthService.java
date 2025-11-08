@@ -7,6 +7,7 @@ import com.example.bankrest.dto.user.UserResponseDto;
 import com.example.bankrest.entity.User;
 import com.example.bankrest.exception.InvalidCredentialsException;
 import com.example.bankrest.exception.UserAlreadyExistsException;
+import com.example.bankrest.mapper.UserMapper;
 import com.example.bankrest.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class AuthService {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final UserMapper userMapper;
 
     public AuthResponseDto register(RegisterRequestDto registerRequest, boolean isUser) {
         log.info("Starting registration user: {}", registerRequest.getUsername());
@@ -37,13 +39,13 @@ public class AuthService {
         }
 
         UserResponseDto createdUser = userService.create(registerRequest, isUser);
-        User user = userService.findByUsername(createdUser.getUsername());
-        String token = jwtUtil.generateToken(user);
+//        User user = userService.findByUsername(createdUser.getUsername());
+        String token = jwtUtil.generateToken(userMapper.userResponseDtoToUserEntity(createdUser));
 
         return AuthResponseDto.builder()
                 .token(token)
-                .username(user.getUsername())
-                .role(user.getRole().name())
+                .username(createdUser.getUsername())
+                .role(createdUser.getRole().name())
                 .build();
     }
 

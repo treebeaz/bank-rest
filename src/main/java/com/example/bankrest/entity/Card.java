@@ -26,15 +26,15 @@ public class Card {
     @Column(name = "last_digits", nullable = false, length = 4)
     private String lastDigits;
 
+    @Column(name = "hash_card_number", unique = true, nullable = false)
+    private String hashCardNumber;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, length = 128)
-    private String firstname;
-
-    @Column(nullable = false, length = 128)
-    private String lastname;
+    @Column(name = "cardholder_name", nullable = false)
+    private String cardholderName;
 
     @Column(precision = 15, scale = 2)
     private BigDecimal balance;
@@ -62,4 +62,5 @@ public class Card {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
 }
