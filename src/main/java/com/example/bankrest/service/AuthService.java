@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @Slf4j
 public class AuthService {
 
@@ -31,27 +31,21 @@ public class AuthService {
     private final UserMapper userMapper;
 
     public AuthResponseDto register(RegisterRequestDto registerRequest, boolean isUser) {
-        log.info("Starting registration user: {}", registerRequest.getUsername());
-
         if (userService.existsByUsername(registerRequest.getUsername())) {
-            log.error("Username already exists : {}", registerRequest.getUsername());
+            log.error("AuthService.register.fail");
             throw new UserAlreadyExistsException(registerRequest.getUsername());
         }
 
-        UserResponseDto createdUser = userService.create(registerRequest, isUser);
-//        User user = userService.findByUsername(createdUser.getUsername());
+        UserResponseDto createdUser = userService.createUser(registerRequest, isUser);
         String token = jwtUtil.generateToken(userMapper.userResponseDtoToUserEntity(createdUser));
 
-        return AuthResponseDto.builder()
-                .token(token)
-                .username(createdUser.getUsername())
-                .role(createdUser.getRole().name())
-                .build();
+        log.info("AuthService.register.success_for_user: {}", createdUser.getId());
+
+        return buildAuthResponse(token, createdUser.getUsername(), createdUser.getRole().name());
     }
 
-    public AuthResponseDto login(AuthRequestDto authRequest) {
-        log.info("Starting login user: {}", authRequest.getUsername());
 
+    public AuthResponseDto login(AuthRequestDto authRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -59,19 +53,25 @@ public class AuthService {
                             authRequest.getPassword()
                     )
             );
+
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             User user = userService.findByUsername(userDetails.getUsername());
             String token = jwtUtil.generateToken(user);
 
-            return AuthResponseDto.builder()
-                    .token(token)
-                    .username(user.getUsername())
-                    .role(user.getRole().name())
-                    .build();
+            return buildAuthResponse(token, user.getUsername(), user.getRole().name());
 
         } catch (BadCredentialsException e) {
-            log.warn("Failed login attempt for username: {}", authRequest.getUsername());
+            log.error("AuthService.login.fail");
             throw new InvalidCredentialsException("Invalid username or password");
         }
     }
+
+    private AuthResponseDto buildAuthResponse(String token, String username, String role) {
+        return AuthResponseDto.builder()
+                .token(token)
+                .username(username)
+                .role(role)
+                .build();
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.example.bankrest.controller;
 
+import com.example.bankrest.dto.card.CardRequestDto;
 import com.example.bankrest.dto.card.CardResponseDto;
 import com.example.bankrest.service.CardService;
 import lombok.NonNull;
@@ -35,9 +36,15 @@ public class CardController {
         return ResponseEntity.ok().body(cardService.getBalance(cardId));
     }
 
-    @PostMapping("/{cardId}/blocked")
-    public ResponseEntity<CardResponseDto> requestBlockCard(@PathVariable @NonNull Long cardId) {
-        CardResponseDto response = cardService.requestCardBlocked(cardId);
+    @PostMapping("/{cardId}/block")
+    public ResponseEntity<CardResponseDto> requestCardBlock(@PathVariable @NonNull Long cardId) {
+        CardResponseDto response = cardService.requestCardBlock(cardId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<CardResponseDto> requestCreateCard(@RequestBody CardRequestDto cardRequestDto) {
+        CardResponseDto response = cardService.requestCreateCard(cardRequestDto);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 }

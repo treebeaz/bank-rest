@@ -48,10 +48,10 @@ public class User {
     @Builder.Default
     private List<Card> cards = new ArrayList<>();
 
-    public void addCard(Card card) {
-        this.cards.add(card);
-        card.setUser(this);
-    }
+//    public void addCard(Card card) {
+//        this.cards.add(card);
+//        card.setUser(this);
+//    }
 
     @PrePersist
     protected void onCreate() {

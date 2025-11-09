@@ -1,5 +1,6 @@
 package com.example.bankrest.component;
 
+import com.example.bankrest.dto.CardInfo;
 import com.example.bankrest.repository.CardRepository;
 import com.google.common.hash.Hashing;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,9 @@ public class CardNumberGenerator {
 
     private static final String BIN = "411111";
     private final CardRepository cardRepository;
+    private final CardCrypto cardCrypto;
 
-    public String[] generateUniqueCardNumber() {
+    public CardInfo generateUniqueCardNumber() {
         String cardNumber;
         String hashNumber;
 
@@ -24,7 +26,15 @@ public class CardNumberGenerator {
             hashNumber = getHashCardNumber(cardNumber);
         } while (!isUnique(hashNumber));
 
-        return new String[]{cardNumber, hashNumber};
+        return createUniqueCardNumber(cardNumber, hashNumber);
+    }
+
+    private CardInfo createUniqueCardNumber(String cardNumber, String hashNumber) {
+        return CardInfo.builder()
+                .cardNumber(cardCrypto.encrypt(cardNumber))
+                .hashCardNumber(hashNumber)
+                .lastDigits(cardNumber.substring(cardNumber.length() - 4))
+                .build();
     }
 
     private boolean isUnique(String hash) {

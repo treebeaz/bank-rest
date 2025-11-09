@@ -13,8 +13,9 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/admin")
-@PreAuthorize("hasRole('ADMIN')")
+@RequestMapping("/api/admin/cards")
+// Авторизация админов
+@PreAuthorize("hasRole('ADMIN')")  // вынести в константы (enum)
 public class AdminController {
 
     private final CardService cardService;
@@ -25,28 +26,26 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/cards")
+    @GetMapping("/all")
     public ResponseEntity<List<CardResponseDto>> getAllCards() {
         return ResponseEntity.ok().body(cardService.getAllCards());
     }
 
-    @PostMapping("/cards/{cardId}/blocked")
-    public ResponseEntity<CardResponseDto> blockCard(@PathVariable Long cardId) {
-        CardResponseDto response = cardService.blockedCard(cardId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    @PostMapping("/{cardId}/block")
+    public ResponseEntity<CardResponseDto> cardBlock(@PathVariable Long cardId) {
+        CardResponseDto response = cardService.cardBlock(cardId);
+        return ResponseEntity.ok().body(response);
     }
 
-    @DeleteMapping("/cards/{cardId}/delete")
+    @DeleteMapping("/{cardId}/delete")
     public ResponseEntity<Void> deleteCard(@PathVariable Long cardId) {
-        if (cardService.deleteCard(cardId)) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        cardService.deleteCard(cardId);
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/cards/{cardId}/activate")
+    @PostMapping("/{cardId}/activate")
     public ResponseEntity<CardResponseDto> activateCard(@PathVariable Long cardId) {
         CardResponseDto response = cardService.activateCard(cardId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok().body(response);
     }
 }

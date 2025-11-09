@@ -34,5 +34,4 @@ public class AuthController {
         log.info("Login user successful: {}", response.getUsername());
         return ResponseEntity.ok(response);
     }
-
 }
