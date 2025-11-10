@@ -1,6 +1,6 @@
 package com.example.bankrest.component;
 
-import com.example.bankrest.dto.CardInfo;
+import com.example.bankrest.dto.card.CardInfo;
 import com.example.bankrest.repository.CardRepository;
 import com.google.common.hash.Hashing;
 import lombok.RequiredArgsConstructor;

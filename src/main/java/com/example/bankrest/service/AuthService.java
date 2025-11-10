@@ -32,14 +32,14 @@ public class AuthService {
 
     public AuthResponseDto register(RegisterRequestDto registerRequest, boolean isUser) {
         if (userService.existsByUsername(registerRequest.getUsername())) {
-            log.error("AuthService.register.fail");
-            throw new UserAlreadyExistsException(registerRequest.getUsername());
+            log.error("AuthService.register.fail.UserExists");
+            throw new UserAlreadyExistsException("User already exists");
         }
 
         UserResponseDto createdUser = userService.createUser(registerRequest, isUser);
         String token = jwtUtil.generateToken(userMapper.userResponseDtoToUserEntity(createdUser));
 
-        log.info("AuthService.register.success_for_user: {}", createdUser.getId());
+        log.info("AuthService.register.success.forUser: {}", createdUser.getId());
 
         return buildAuthResponse(token, createdUser.getUsername(), createdUser.getRole().name());
     }
@@ -58,10 +58,12 @@ public class AuthService {
             User user = userService.findByUsername(userDetails.getUsername());
             String token = jwtUtil.generateToken(user);
 
+            log.info("AuthService.login.success.forUser: {}", user.getId());
+
             return buildAuthResponse(token, user.getUsername(), user.getRole().name());
 
         } catch (BadCredentialsException e) {
-            log.error("AuthService.login.fail");
+            log.error("AuthService.login.fail.InvalidCredentials");
             throw new InvalidCredentialsException("Invalid username or password");
         }
     }

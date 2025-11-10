@@ -37,7 +37,7 @@ public class UserService implements UserDetailsService {
                     user.setEnabled(true);
                     user.setRole((isUser) ? Role.USER : Role.ADMIN);
                     user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-                    log.info("UserService.createUser.success_for_user: {}", user.getId());
+                    log.info("UserService.createUser.success.forUser: {}", user.getId());
                     return userRepository.save(user);
                 })
                 .map(userMapper::userEntityToUserResponseDto)
@@ -68,4 +68,5 @@ public class UserService implements UserDetailsService {
     private String getRole(String role) {
         return "ROLE_" + role;
     }
+
 }

@@ -1,4 +1,4 @@
-package com.example.bankrest.dto;
+package com.example.bankrest.dto.card;
 
 import lombok.*;
 

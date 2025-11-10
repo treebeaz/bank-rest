@@ -2,13 +2,13 @@ package com.example.bankrest.dto.user;
 
 import com.example.bankrest.entity.Card;
 import com.example.bankrest.entity.Role;
+import lombok.Builder;
 import lombok.Value;
-import lombok.experimental.FieldNameConstants;
 
 import java.util.List;
 
 @Value
-@FieldNameConstants
+@Builder
 public class UserResponseDto {
     Long id;
     String username;
