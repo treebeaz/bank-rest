@@ -5,7 +5,6 @@ import com.example.bankrest.dto.user.UserResponseDto;
 import com.example.bankrest.entity.Role;
 import com.example.bankrest.entity.User;
 import com.example.bankrest.exception.UserCreationException;
-import com.example.bankrest.integration.IntegrationTestBase;
 import com.example.bankrest.mapper.UserMapper;
 import com.example.bankrest.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -13,13 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
