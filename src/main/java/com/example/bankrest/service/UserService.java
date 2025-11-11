@@ -5,6 +5,7 @@ import com.example.bankrest.dto.auth.RegisterRequestDto;
 import com.example.bankrest.dto.user.UserResponseDto;
 import com.example.bankrest.entity.Role;
 import com.example.bankrest.entity.User;
+import com.example.bankrest.exception.UserCreationException;
 import com.example.bankrest.mapper.UserMapper;
 import com.example.bankrest.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,25 +29,24 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    protected UserResponseDto createUser(RegisterRequestDto registerRequest,
-                                     boolean isUser) {
+    public UserResponseDto createUser(RegisterRequestDto registerRequest) {
 
         return Optional.of(registerRequest)
                 .map(userMapper::registerRequestDtoToUser)
                 .map(user -> {
                     user.setEnabled(true);
-                    user.setRole((isUser) ? Role.USER : Role.ADMIN);
+                    user.setRole(Role.USER);
                     user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
                     log.info("UserService.createUser.success.forUser: {}", user.getId());
                     return userRepository.save(user);
                 })
                 .map(userMapper::userEntityToUserResponseDto)
-                .orElseThrow(() -> new RuntimeException("Failed to create user"));
+                .orElseThrow(() -> new UserCreationException("Failed to create user"));
     }
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user"));
     }
 
     public boolean existsByUsername(String username) {
@@ -56,7 +56,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user"));
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())

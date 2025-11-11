@@ -12,7 +12,7 @@ public final class LogMessages {
     public static final String CARD_NOT_ACTIVE_LOG_MESSAGE_IN_GLOBAL_HANDLER = "GlobalRestControllerExceptionHandler.handleCardNotActive.fail.cardNotActive";
     public static final String DIFFERENT_CARDHOLDERS_LOG_MESSAGE_IN_GLOBAL_HANDLER = "GlobalRestControllerExceptionHandler.handleDifferentCardHolders.fail.differentCardHolders";
     public static final String SAME_CARD_TRANSFER_LOG_MESSAGE_IN_GLOBAL_HANDLER = "GlobalRestControllerExceptionHandler.handleSameCardTransfer.fail.sameCardTransfer";
-
+    public static final String CARD_ALREADY_BLOCKED_LOG_MESSAGE_IN_GLOBAL_HANDLER = "GlobalRestControllerExceptionHandler.handleCardAlreadyBlocked.fail.cardAlreadyBlocked";
 
     private LogMessages() {}
 }

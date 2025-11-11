@@ -13,6 +13,7 @@ public final class ErrorMessages {
     public static final String CARD_NOT_ACTIVE_ERROR_MESSAGE = "One of the cards is not active";
     public static final String DIFFERENT_CARDHOLDERS_ERROR_MESSAGE = "One of the cards is not cardholder";
     public static final String SAME_CARD_TRANSFER_ERROR_MESSAGE = "Can't transfer to the same card";
+    public static final String CARD_ALREADY_BLOCKED_ERROR_MESSAGE = "Card already blocked";
 
     private ErrorMessages() {}
 }

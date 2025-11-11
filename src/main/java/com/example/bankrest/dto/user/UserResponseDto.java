@@ -15,6 +15,6 @@ public class UserResponseDto {
     String firstname;
     String lastname;
     Role role;
-    List<Card> cards;
+//    List<Card> cards;
 
 }

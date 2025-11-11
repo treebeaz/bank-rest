@@ -23,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -58,7 +56,8 @@ public class CardService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public CardResponseDto createCard(Long userId) {
-        Card card = cardRepository.findByUser_IdAndStatus(userId, DEFAULT_STATUS_WHEN_CREATING_CARD).orElseThrow(() -> new CardNotFoundException("Card not found"));
+        Card card = cardRepository.findByUser_IdAndStatus(userId, DEFAULT_STATUS_WHEN_CREATING_CARD)
+                .orElseThrow(() -> new CardNotFoundException("Card not found"));
         card.setStatus(Status.ACTIVE);
         log.info("CardService.createCard.success.forUser: {}", userId);
 
@@ -66,7 +65,16 @@ public class CardService {
     }
 
     private Card buildCard(CardInfo cardInfo, User user) {
-        return Card.builder().cardNumber(cardInfo.getCardNumber()).lastDigits(cardInfo.getLastDigits()).hashCardNumber(cardInfo.getHashCardNumber()).user(user).cardholderName(buildCardHolderName(user.getFirstname(), user.getLastname())).balance(DEFAULT_BALANCE_WHEN_CREATING_CARD).status(DEFAULT_STATUS_WHEN_CREATING_CARD).expiryDate(DEFAULT_EXPIRY_DATE_WHEN_CREATING_CARD).build();
+        return Card.builder()
+                .cardNumber(cardInfo.getCardNumber())
+                .lastDigits(cardInfo.getLastDigits())
+                .hashCardNumber(cardInfo.getHashCardNumber())
+                .user(user)
+                .cardholderName(buildCardHolderName(user.getFirstname(), user.getLastname()))
+                .balance(DEFAULT_BALANCE_WHEN_CREATING_CARD)
+                .status(DEFAULT_STATUS_WHEN_CREATING_CARD)
+                .expiryDate(DEFAULT_EXPIRY_DATE_WHEN_CREATING_CARD)
+                .build();
     }
 
     private String buildCardHolderName(String firstname, String lastname) {
@@ -74,7 +82,14 @@ public class CardService {
     }
 
     private CardResponseDto createResponse(Card card) {
-        return CardResponseDto.builder().id(card.getId()).masked(getMask(card.getLastDigits())).cardHolderName(card.getCardholderName()).balance(card.getBalance()).expiryDate(card.getExpiryDate()).status(card.getStatus()).build();
+        return CardResponseDto.builder()
+                .id(card.getId())
+                .masked(getMask(card.getLastDigits()))
+                .cardHolderName(card.getCardholderName())
+                .balance(card.getBalance())
+                .expiryDate(card.getExpiryDate())
+                .status(card.getStatus())
+                .build();
     }
 
     private String getMask(String lastDigits) {
@@ -83,7 +98,8 @@ public class CardService {
 
     public Page<CardResponseDto> getUserCards(int page, int size) {
         User user = getAuthenticatedUser();
-        Page<Card> cards = cardRepository.findByUser_Id(user.getId(), PageRequest.of(page, size, Sort.by("createdAt").descending()));
+        Page<Card> cards = cardRepository.findByUser_Id(user.getId(),
+                PageRequest.of(page, size, Sort.by("createdAt").descending()));
         log.info("CardService.getUserCards.success: {}", cards.getTotalElements());
 
         return cards.map(this::createResponse);
@@ -91,7 +107,8 @@ public class CardService {
 
     public BigDecimal getBalance(Long cardId) {
         User user = getAuthenticatedUser();
-        Card card = cardRepository.findByIdAndUser_Id(cardId, user.getId()).orElseThrow(() -> new CardNotFoundException("Card not found"));
+        Card card = cardRepository.findByIdAndUser_Id(cardId,
+                user.getId()).orElseThrow(() -> new CardNotFoundException("Card not found"));
         log.info("CardService.getBalance.success.forUser: {}", card.getUser().getId());
 
         return card.getBalance();
@@ -113,9 +130,10 @@ public class CardService {
     @Transactional
     public CardResponseDto requestCardBlock(Long cardId) {
         User user = getAuthenticatedUser();
-        Card card = cardRepository.findByIdAndUser_Id(cardId, user.getId()).orElseThrow(() -> new CardNotFoundException("Card not found"));
+        Card card = cardRepository.findByIdAndUser_Id(cardId,
+                user.getId()).orElseThrow(() -> new CardNotFoundException("Card not found"));
         if (card.getStatus().equals(Status.BLOCKED)) {
-            throw new CardAlreadyBlocked("Card already is blocked");
+            throw new CardAlreadyBlockedException("Card already is blocked");
         } else {
             card.setStatus(Status.PENDING_BLOCK);
             log.info("CardService.requestCardBlock.success.forUser: {}", card.getUser().getId());
@@ -126,26 +144,30 @@ public class CardService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public CardResponseDto cardBlock(Long cardId) {
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new CardNotFoundException("Card not found"));
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found"));
         switch (card.getStatus()) {
             case ACTIVE:
                 throw new CardAlreadyActiveException("Card already activated");
             case PENDING_BLOCK:
                 card.setStatus(Status.BLOCKED);
-                break;
+                log.info("CardService.cardBlock.success.forUser: {}", card.getUser().getId());
+                return createResponse(card);
             case BLOCKED:
-                throw new CardAlreadyBlocked("Card already is blocked");
+                throw new CardAlreadyBlockedException("Card already is blocked");
             default:
                 throw new CardInvalidStatusException("Can't blocked card in currentStatus" + card.getStatus());
         }
-        log.info("CardService.cardBlock.success.forUser: {}", card.getUser().getId());
-        return createResponse(card);
     }
+
+    /// Еще один метод нужен на запрос разблокировки карты от пользователя.
+    ///  Карта в нем переходит в новое состояние, допустим PENDING_UNBLOCK и обрабатывается в методе ниже
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public CardResponseDto activateCard(Long cardId) {
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new CardNotFoundException("Card not found"));
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found"));
         switch (card.getStatus()) {
             case ACTIVE:
                 throw new CardAlreadyActiveException("Card already activated");
@@ -153,22 +175,23 @@ public class CardService {
                 throw new CardPendingBlockException("Card waiting be block");
             case BLOCKED:
                 card.setStatus(Status.ACTIVE);
-                break;
+                log.info("CardService.activateCard.success.forUser {}", card.getUser().getId());
+                return createResponse(card);
             default:
                 throw new CardInvalidStatusException("Card status conflict");
         }
-        log.info("CardService.activateCard.success.forUser {}", card.getUser().getId());
-        return createResponse(card);
     }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteCard(Long cardId) {
-        cardRepository.deleteCardById(cardId).orElseThrow(() -> new CardNotFoundException("Card not found"));
+        cardRepository.deleteCardById(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found"));
     }
 
     @Transactional(timeout = 5)
     public void moneyTransfer(Long cardId, TransferCardRequestDto transferCardRequestDto) {
+
         Long firstLock = Math.min(cardId, transferCardRequestDto.getId());
         Long secondLock = Math.max(cardId, transferCardRequestDto.getId());
 

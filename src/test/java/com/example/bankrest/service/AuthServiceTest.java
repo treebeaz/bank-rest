@@ -8,34 +8,37 @@ import com.example.bankrest.entity.Role;
 import com.example.bankrest.entity.User;
 import com.example.bankrest.exception.InvalidCredentialsException;
 import com.example.bankrest.exception.UserAlreadyExistsException;
-import com.example.bankrest.integration.IntegrationTestBase;
 import com.example.bankrest.mapper.UserMapper;
 import com.example.bankrest.util.JwtUtil;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class AuthServiceTest extends IntegrationTestBase {
-    @Autowired
-    private AuthService authService;
+@ExtendWith(MockitoExtension.class)
+public class AuthServiceTest {
 
-    @MockitoBean
+    @Mock
     private UserService userService;
 
-    @MockitoBean
+    @Mock
     private JwtUtil jwtUtil;
 
-    @MockitoBean
+    @Mock
     private AuthenticationManager authenticationManager;
 
-    @MockitoBean
+    @Mock
     private UserMapper userMapper;
+
+    @InjectMocks
+    private AuthService authService;
 
     @Test
     void register_NewUser_Success() {
@@ -64,7 +67,7 @@ public class AuthServiceTest extends IntegrationTestBase {
                 .build();
 
         when(userService.existsByUsername("user")).thenReturn(false);
-        when(userService.createUser(request, true)).thenReturn(mockUserResponse);
+        when(userService.createUser(request)).thenReturn(mockUserResponse);
         when(userMapper.userResponseDtoToUserEntity(mockUserResponse)).thenReturn(mockUserEntity);
         when(jwtUtil.generateToken(mockUserEntity)).thenReturn("test.jwt.token");
 
@@ -78,7 +81,7 @@ public class AuthServiceTest extends IntegrationTestBase {
     }
 
     @Test
-    void register_ExistingUser_ThrowUserAlreadyExistsException() {
+    void register_WhenUserExists_ThrowUserAlreadyExistsException() {
         RegisterRequestDto request = RegisterRequestDto.builder()
                 .username("qwe")
                 .password("password")
@@ -120,7 +123,7 @@ public class AuthServiceTest extends IntegrationTestBase {
                 .build();
 
         when(userService.existsByUsername("user")).thenReturn(false);
-        when(userService.createUser(request, true)).thenReturn(mockUserResponse);
+        when(userService.createUser(request)).thenReturn(mockUserResponse);
         when(userMapper.userResponseDtoToUserEntity(mockUserResponse)).thenReturn(mockUserEntity);
         when(jwtUtil.generateToken(mockUserEntity)).thenReturn("test.jwt.token");
 

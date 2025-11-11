@@ -36,7 +36,7 @@ public class AuthService {
             throw new UserAlreadyExistsException("User already exists");
         }
 
-        UserResponseDto createdUser = userService.createUser(registerRequest, isUser);
+        UserResponseDto createdUser = userService.createUser(registerRequest);
         String token = jwtUtil.generateToken(userMapper.userResponseDtoToUserEntity(createdUser));
 
         log.info("AuthService.register.success.forUser: {}", createdUser.getId());

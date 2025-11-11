@@ -5,7 +5,6 @@ import com.example.bankrest.constants.LogMessages;
 import com.example.bankrest.dto.auth.ErrorResponseDto;
 import com.example.bankrest.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,6 +71,11 @@ public class GlobalRestControllerExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler(SameCardTransferException.class)
     public ResponseEntity<ErrorResponseDto> handleSameCardTransfer(HttpServletRequest request, SameCardTransferException ex) {
         return createResponse(request, ex, HttpStatus.CONFLICT, ErrorMessages.SAME_CARD_TRANSFER_ERROR_MESSAGE, LogMessages.SAME_CARD_TRANSFER_LOG_MESSAGE_IN_GLOBAL_HANDLER);
+    }
+
+    @ExceptionHandler(CardAlreadyBlockedException.class)
+    public ResponseEntity<ErrorResponseDto> handleCardAlreadyBlocked(HttpServletRequest request, CardAlreadyBlockedException ex) {
+        return createResponse(request, ex, HttpStatus.CONFLICT, ErrorMessages.CARD_ALREADY_BLOCKED_ERROR_MESSAGE, LogMessages.CARD_ALREADY_BLOCKED_LOG_MESSAGE_IN_GLOBAL_HANDLER);
     }
 
     private ResponseEntity<ErrorResponseDto> createResponse(HttpServletRequest request,

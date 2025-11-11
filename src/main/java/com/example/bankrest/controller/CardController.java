@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class CardController {
     @ApiResponses({
             @ApiResponse(responseCode = "202", description = "Запрос на создание успешно создан"),
             @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
-            @ApiResponse(responseCode = "409", description = "Карта уже находится в ожидании создания")
+//            @ApiResponse(responseCode = "409", description = "Карта уже находится в ожидании создания")
     })
     public ResponseEntity<CardResponseDto> requestCreateCard() {
         CardResponseDto response = cardService.requestCreateCard();
